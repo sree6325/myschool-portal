@@ -62,13 +62,12 @@ if menu == "Teacher Portal":
         with st.form("att_form"):
             status = st.radio("Status", ["Present", "Absent"], horizontal=True)
             reason = st.text_input("Reason (if Absent)")
-            if st.form_submit_button("Save Attendance"):
+if st.form_submit_button("Save Attendance"):
             # 1. ഡാറ്റാബേസിലേക്ക് സേവ് ചെയ്യുന്നു
-            # student_info എന്നത് ഡാറ്റാഫ്രെയിം ആയതുകൊണ്ട്, അതിൽ നിന്ന് ക്ലാസ് വിവരങ്ങൾ എടുക്കുന്നു
             class_section = student_info['Class_Section'].iloc[0]
             save_attendance(str(selected_date), class_section, sel_name, status, reason)
 
-            # 2. പഴയ കോഡ് (ഇത് മാറ്റരുത്, ഇത് ആപ്പിൽ അപ്പോൾ തന്നെ ഡാറ്റ കാണിക്കാൻ വേണം)
+            # 2. പഴയ കോഡ് (ഇത് ആപ്പിൽ ഡാറ്റ കാണിക്കാൻ ആവശ്യമാണ്)
             new_row = {'Date': selected_date, 'Class_Section': class_section, 'Name': sel_name, 'Status': status, 'Reason': reason}
             st.session_state.attendance_df = pd.concat([st.session_state.attendance_df, pd.DataFrame([new_row])])
             st.success("Attendance saved!")
