@@ -58,27 +58,29 @@ if menu == "Teacher Portal":
     selected_date = st.date_input("Date", date.today())
     
     tab1, tab2 = st.tabs(["Attendance", "Discipline & Achievements"])
+tab1, tab2 = st.tabs(["Attendance", "Discipline & Achievement"])
+    
     with tab1:
         with st.form("att_form"):
-            status = st.radio("Status", ["Present", "Absent"], horizontal=True)
+            status = st.radio("Status", ["Present", "Absent"])
             reason = st.text_input("Reason (if Absent)")
-if st.form_submit_button("Save Attendance"):
-            # 1. ഡാറ്റാബേസിലേക്ക് സേവ് ചെയ്യുന്നു
-            class_section = student_info['Class_Section'].iloc[0]
-            save_attendance(str(selected_date), class_section, sel_name, status, reason)
+            if st.form_submit_button("Save Attendance"):
+                # 1. ഡാറ്റാബേസിലേക്ക് സേവ് ചെയ്യുന്നു
+                class_section = student_info['Class_Section'].iloc[0]
+                save_attendance(str(selected_date), class_section, sel_name, status, reason)
 
-            # 2. പഴയ കോഡ് (ഇത് ആപ്പിൽ ഡാറ്റ കാണിക്കാൻ ആവശ്യമാണ്)
-            new_row = {'Date': selected_date, 'Class_Section': class_section, 'Name': sel_name, 'Status': status, 'Reason': reason}
-            st.session_state.attendance_df = pd.concat([st.session_state.attendance_df, pd.DataFrame([new_row])])
-            st.success("Attendance saved!")
+                # 2. പഴയ കോഡ്
+                new_row = {'Date': selected_date, 'Class_Section': class_section, 'Name': sel_name, 'Status': status, 'Reason': reason}
+                st.session_state.attendance_df = pd.concat([st.session_state.attendance_df, pd.DataFrame([new_row])])
+                st.success("Attendance saved!")
 
     with tab2:
         with st.form("rec_form"):
             rec_type = st.selectbox("Type", ["Discipline Issue", "Achievement"])
             detail = st.text_area("Details")
             if st.form_submit_button("Save Record"):
-                new_rec = {'Date': selected_date, 'Class_Section': sel_class_sec, 'Admission_No': student_info['Admission_No'], 'Student_Name': student_info['Name'], 'Type': rec_type, 'Detail': detail}
-                st.session_state.records_df = pd.concat([st.session_state.records_df, pd.DataFrame([new_rec])], ignore_index=True)
+                new_rec = {'Date': selected_date, 'Class_Section': student_info['Class_Section'].iloc[0], 'Type': rec_type, 'Detail': detail}
+                st.session_state.records_df = pd.concat([st.session_state.records_df, pd.DataFrame([new_rec])])
                 st.success("Record Saved!")
 
 # 5. Principal Dashboard Logic
