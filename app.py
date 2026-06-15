@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import date
 import sqlite3
 
-# 0. ഡാറ്റാബേസ് സെറ്റപ്പ്
+# 1. ഡാറ്റാബേസ് സെറ്റപ്പ്
 def init_db():
     conn = sqlite3.connect('school.db')
     c = conn.cursor()
@@ -22,11 +22,11 @@ def save_attendance(date, class_section, student_name, status, reason):
 
 init_db()
 
-# 1. Page Configuration
+# 2. Page Configuration
 st.set_page_config(page_title="Dechentsemo Central School", layout="wide")
 st.markdown("<h1 style='text-align: center; color: #1f77b4;'>🏫 DECHENTSEMO CENTRAL SCHOOL</h1>", unsafe_allow_html=True)
 
-# 2. Initialization
+# 3. Initialization
 if 'students_list' not in st.session_state:
     st.session_state.students_list = pd.DataFrame([
         {'Class_Section': '8A', 'Admission_No': '101', 'Name': 'Rahul'},
@@ -39,15 +39,12 @@ if 'attendance_df' not in st.session_state:
 if 'records_df' not in st.session_state:
     st.session_state.records_df = pd.DataFrame(columns=['Date', 'Class_Section', 'Type', 'Detail'])
 
-# 3. Logic
-# ഇവിടെ നിങ്ങളുടെ പഴയ ഫിൽട്ടർ കോഡ് വരും (filtered = ... )
-# ഉദാഹരണത്തിന്:
+# 4. Logic & Tabs
 filtered = st.session_state.students_list
 sel_name = st.selectbox("Select Student", filtered['Name'].unique())
 student_info = filtered[filtered['Name'] == sel_name]
 selected_date = st.date_input("Date", date.today())
 
-# 4. Tabs
 tab1, tab2 = st.tabs(["Attendance", "Discipline & Achievement"])
 
 with tab1:
@@ -72,6 +69,23 @@ with tab2:
             st.session_state.records_df = pd.concat([st.session_state.records_df, pd.DataFrame([new_rec])])
             st.success("Record Saved!")
 
-# 5. Dashboard
-st.subheader("Attendance Records")
-st.dataframe(st.session_state.attendance_df)
+# 5. Principal Dashboard
+st.markdown("---")
+st.header("👑 Principal Dashboard")
+st.subheader("Attendance Overview")
+st.dataframe(st.session_state.attendance_df, use_container_width=True)
+
+st.subheader("Discipline & Achievement Records")
+st.dataframe(st.session_state.records_df, use_container_width=True)
+
+# ഡൗൺലോഡ് ബട്ടണുകൾ
+col1, col2 = st.columns(2)
+with col1:
+    if not st.session_state.attendance_df.empty:
+        csv = st.session_state.attendance_df.to_csv(index=False).encode('utf-8')
+        st.download_button("Download Attendance CSV", csv, "attendance.csv", "text/csv")
+
+with col2:
+    if not st.session_state.records_df.empty:
+        csv_rec = st.session_state.records_df.to_csv(index=False).encode('utf-8')
+        st.download_button("Download Records CSV", csv_rec, "records.csv", "text/csv")
